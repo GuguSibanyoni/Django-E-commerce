@@ -1,10 +1,59 @@
 <template>
-  <div class="home">home</div>
+  <div class="home">Home</div>
+    <section class="hero is-medium is-dark mb-6">
+        <div class="hero-body has-text-centered">
+            <p class="title mb-6">
+                Welcome to Gugu's Jackets
+            </p>
+            <p class="subtitle">
+                The best jacket store on and offline
+            </p>
+        </div>
+    </section>
+
+    <div class="columns is-multiline">
+      <div class="column is-12">
+          <h2 class="is-size-2 has-text-centered">Latest products</h2>
+      </div>
+
+      <ProductBox 
+        v-for="product in latestProducts"
+        v-bind:key="product.id"
+        v-bind:product="product" />
+    </div>
 </template>
 
 <script>
+import axios from 'axios'
+import ProductBox from '@/components/ProductBox'
+
 export default {
   name: "Home",
-  components: {},
-};
+  data() {
+    return {
+      latestProducts: []
+    }
+  },
+  components: {
+  ProductBox
+  },
+  mounted() {
+   this.getLatestProducts()
+   document.title = "Home | Gugu's jackets"
+  },
+  methods: {
+    async getLatestProducts() {
+      this.$store.commit('setIsLoading', true)
+      await axios
+        .get('/api/v1/latest-products/')
+        .then(response => {
+          this.latestProducts = response.data
+        })
+        .catch(error => {
+          console.log(error)
+        })
+      this.$store.commit('setIsLoading', false)
+    }
+  }
+}
 </script>
